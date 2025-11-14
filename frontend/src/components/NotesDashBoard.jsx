@@ -10,12 +10,12 @@ export default function NotesDashboard() {
   const [content, setContent] = useState("");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const BASE_URL = "https://note-taking-application-backend.vercel.app";
   // ✅ Fetch notes
   const fetchNotes = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/notes");
+      const res = await axios.get(`${BASE_URL}/api/notes`);
       setNotes(res.data);
     } catch (err) {
       toast.error("Error fetching notes!");
@@ -37,7 +37,7 @@ export default function NotesDashboard() {
     }
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5000/api/notes", {
+      const res = await axios.post(`${BASE_URL}/api/notes`, {
         title: title || "Untitled",
         content,
       });
@@ -57,7 +57,7 @@ export default function NotesDashboard() {
   // ✅ Delete one note
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/notes/${id}`);
+      await axios.delete(`${BASE_URL}/api/notes/${id}`);
       setNotes((prev) => prev.filter((note) => note._id !== id));
       toast.info("🗑️ Note deleted");
     } catch (err) {
@@ -70,7 +70,7 @@ export default function NotesDashboard() {
   const clearAll = async () => {
     if (!window.confirm("Are you sure you want to delete all notes?")) return;
     try {
-      await axios.delete("http://localhost:5000/api/notes");
+      await axios.delete(`${BASE_URL}/api/notes`);
       setNotes([]);
       toast.success("🧹 All notes deleted!");
     } catch (err) {

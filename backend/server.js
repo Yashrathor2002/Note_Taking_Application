@@ -12,7 +12,7 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: "https://note-taking-application-k4k3.vercel.app",
+    origin: "https://note-taking-application-frontend-nine.vercel.app/",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
