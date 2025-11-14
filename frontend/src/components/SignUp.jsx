@@ -1,32 +1,37 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { API } from "./api";
 
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const BASE_URL = "https://note-taking-application-backend.vercel.app";
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const res = await API.post("/api/users/signup", {
-        name,
-        email,
-        password,
+      const res = await fetch(`${BASE_URL}/api/users/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
-      const data = res.data;
 
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Signup failed");
+
+      // ✅ Only store user name (not token or whole object)
       localStorage.setItem("user", JSON.stringify({ name }));
+
+      // ✅ Notify Navbar to update
       window.dispatchEvent(new Event("userChanged"));
+
       toast.success("🎉 Signup successful! Welcome, " + name + "!");
       navigate("/notes");
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || err.message || "Signup failed"
-      );
+      toast.error(err?.message || "Signup failed");
     }
   }
 
@@ -36,9 +41,11 @@ export default function SignUp() {
       bg-gradient-to-br from-[#001F3F] via-[#002b5b] to-[#4f46e5] 
       relative overflow-hidden"
     >
+      {/* Background glowing circles */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-500 opacity-20 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-600 opacity-20 rounded-full blur-3xl animate-pulse delay-200"></div>
 
+      {/* Signup Card */}
       <div className="relative z-10 w-full max-w-md px-6 py-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl">
         <h3 className="text-3xl font-extrabold text-center text-white mb-6 drop-shadow-md">
           Create Your Account

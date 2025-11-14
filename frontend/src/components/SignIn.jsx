@@ -1,26 +1,39 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { API } from "./api";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const BASE_URL = "https://note-taking-application-backend.vercel.app";
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const res = await API.post("/api/users/login", { email, password });
-      const data = res.data;
+      const res = await fetch(`${BASE_URL}/api/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Login failed");
 
       toast.success("✅ Login successful!");
+      // ✅ Save full user info + token
       localStorage.setItem("user", JSON.stringify({ name: data.user.name }));
+
       localStorage.setItem("token", data.token);
+
+      // ✅ Notify Navbar immediately (so it updates without refresh)
       window.dispatchEvent(new Event("userChanged"));
+
+      // ✅ Redirect to notes dashboard
       navigate("/notes");
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message || "Login error");
+      toast.error(err.message || "Login error");
     }
   }
 
@@ -30,9 +43,11 @@ export default function SignIn() {
       bg-gradient-to-br from-[#001F3F] via-[#002b5b] to-[#4f46e5] 
       relative overflow-hidden"
     >
+      {/* Background glowing circles */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-indigo-500 opacity-20 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-600 opacity-20 rounded-full blur-3xl animate-pulse delay-200"></div>
 
+      {/* SignIn Card */}
       <div className="relative z-10 w-full max-w-md px-6 py-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl">
         <h3 className="text-3xl font-extrabold text-center text-white mb-6 drop-shadow-md">
           Welcome Back 👋
