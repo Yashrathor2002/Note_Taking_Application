@@ -17,18 +17,18 @@ export default function SignUp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
+      console.log({ name, email, password });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
-      // ✅ Only store user name (not token or whole object)
-      localStorage.setItem("user", JSON.stringify({ name }));
+      // store full user info + token
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token);
 
-      // ✅ Notify Navbar to update
+      // notify navbar
       window.dispatchEvent(new Event("userChanged"));
-
-      toast.success("🎉 Signup successful! Welcome, " + name + "!");
+      toast.success(`🎉 Signup successful! Welcome, ${data.user.name}!`);
       navigate("/notes");
     } catch (err) {
       toast.error(err?.message || "Signup failed");
